@@ -3,6 +3,7 @@
 #include "GLU.h"
 #include <stdlib.h>
 #include <GL/glut.h>
+#include <algorithm>
 
 #include "armadillo.h"
 
@@ -18,7 +19,7 @@ extern unsigned int face[FACE][3];
 armadillo::armadillo(QObject *parent) :
     QObject(parent)
 {
-    fixv_num=0;
+    //fixv_num=0;
     newv_num=0;
 	alpha = 0;
 	select = 0;
@@ -50,13 +51,14 @@ void armadillo::draw_scene()
 
 void armadillo::draw_vertex()
 {
+	vector <int>::iterator result,iter;
 	for(int i=0;i<VERTEX;i++)
     {
         glLoadName(i);
         glEnable(GL_POINT_SMOOTH);
         glPointSize(5.0);
         glBegin (GL_POINTS);
-        if(select == 0)
+        /*if(select == 0)//如果当前选点模式为移动点
 		{
 			if(i == cptr)
 			{
@@ -67,17 +69,19 @@ void armadillo::draw_vertex()
 		}
 		else
 		{
-			int j;
-			for(j=0;j<fixv_num;j++)
-			{
-				if(i == fixv[j]){
-					glColor3f(0,1,0);
-					break;
-				}
-			}
-			if(j==fixv_num)
+			//for(iter=fixv.begin();iter!=fixv.end();iter++)
+			//{
+				//if(i == *iter){
+					//glColor3f(0,1,0);
+					//break;
+				//}
+			//}
+			result=find(fixv.begin(),fixv.end(),i);
+			if(result == fixv.end())
 				glColor3f(1,1,1);
-		}
+			else 
+				glColor3f(0,1,0);
+		}*/
         glNormal3fv(Normal[i]);
         glVertex3fv(Vertex[i]);
         glEnd ();
@@ -86,17 +90,17 @@ void armadillo::draw_vertex()
 		glPushMatrix();
 		glTranslatef(Vertex[cptr][0],Vertex[cptr][1],Vertex[cptr][2]);
 		glColor4f(1,0,0,0.2f);
-//		glutSolidSphere( 2.0f, 15, 15 );
+		glutSolidSphere( 2.0f, 15, 15 );
 		glColor3f(1,1,1);
 		glPopMatrix();
 		}
-	 if(fixv_num){
-		for(int j=0;j<fixv_num;j++)
+	 if(!fixv.empty()){
+		for(iter=fixv.begin();iter!=fixv.end();iter++)
 		{
 			glPushMatrix();
-		    glTranslatef(Vertex[fixv[j]][0],Vertex[fixv[j]][1],Vertex[fixv[j]][2]);
+		    glTranslatef(Vertex[*iter][0],Vertex[*iter][1],Vertex[*iter][2]);
 		    glColor4f(1,1,0,0.2f);
-//		    glutSolidSphere( 2.0f, 15, 15 );
+		    glutSolidSphere( 2.0f, 15, 15 );
 		    glColor3f(1,1,1);
 		    glPopMatrix();
 		}
@@ -122,7 +126,7 @@ void armadillo::movevertex(float x, float y, float z)
 
 void armadillo::setfixv(int p)
 {
-	fixv[fixv_num++]=p;
+	fixv.push_back(p);
 }
 
 void armadillo::setalpha(int value)
@@ -137,7 +141,7 @@ int armadillo::reselect()
 
 void armadillo::refreshfix()
 {
-	fixv_num=0;
+	fixv.clear();
 }
 
 void armadillo::cselect(bool value)

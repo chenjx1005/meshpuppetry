@@ -3,6 +3,9 @@
 
 #include <QObject>
 #include <gl/glut.h>
+#include <vector>
+
+using namespace std;
 
 #define VERTEX 172974
 #define FACE 345944
@@ -25,11 +28,12 @@ private:
     GLfloat Vertex[VERTEX][3];
     GLfloat Normal[VERTEX][3];
     unsigned int Face[FACE][3];
-	int fixv[20];//数组fixv记录指定不变的点的index， fixv_num是点的数量
-    int fixv_num;
-    int newv[20]; //newv记录指定移动的点的index， newvp储存对应的指定位置， newv_num是点的数量
-    int newvp[20][3];
-    int newv_num;
+	//int fixv[20];//数组fixv记录指定不变的点的index， fixv_num是点的数量
+	vector <int> fixv;
+    //int fixv_num;
+    int newv[20]; //newv记录指定移动的点的index
+    int newvp[20][3];//newvp储存对应的指定位置
+    int newv_num;//newv_num是点的数量
 	float alpha;//两个约束的权重，数值为0到1，由UI上设计一个滑块控制
 	int select;//当前选择的点是固定点还是移动点，1为固定点，0为移动点
 signals:
