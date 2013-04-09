@@ -77,7 +77,7 @@
      glScalef(0.02f, 0.02f, 0.02f);
      //glTranslatef(0.0, 0.0, -10.0);
      glRotatef(xRot, 1.0, 0.0, 0.0);
-     glRotatef(yRot, 0.0, 1.0, 0.0);
+     glRotatef(yRot+180, 0.0, 1.0, 0.0);
      //glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
      if(!method)
      {a->draw_scene();
@@ -87,7 +87,7 @@
      }
      else
          a->draw_vertex();
-
+	 
  }
 
  void GLWidget::resizeGL(int w, int h)
@@ -195,21 +195,22 @@ void GLWidget::stopPicking()
          stopPicking();
          GLint    viewport[4];
          glGetIntegerv(GL_VIEWPORT, viewport);
-         glReadPixels(event->x(),viewport[3]-event->y(), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &deep);
+         glReadPixels(event->x(),viewport[3]-event->y(), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &deep);//记录移动点的深度信息
          updateGL();
      }
  }
 
  void GLWidget::mouseMoveEvent(QMouseEvent *event)//拖动鼠标执行的事件
  {
-     GLfloat dx = GLfloat(event->x()-lastPos.x()) / width();
-     GLfloat dy = GLfloat(event->y()-lastPos.y()) / height();
-
      if (event->buttons() & Qt::MidButton) {//拖动鼠标中键旋转视角
+		 GLfloat dx = GLfloat(event->x()-lastPos.x()) / width();
+		 GLfloat dy = GLfloat(event->y()-lastPos.y()) / height();
          xRot += dy * 180;
          yRot += dx * 180;
          updateGL();
+		 lastPos = event->pos();
      }
+
 	 if((event->buttons() & Qt::RightButton)&&(a->getptr() != -1)&&(a->reselect()==0))//拖动鼠标右键移动选中点
      {
          /*float x = 0.2*dx * cos(yRot /16 * pi /180);
@@ -233,8 +234,34 @@ void GLWidget::stopPicking()
          gluUnProject(winX, winY, deep, modelview, projection, viewport, &posX, &posY, &posZ);
          a->movevertex(posX,posY,posZ);
          updateGL();
+		 lastPos = event->pos();
      }
-     lastPos = event->pos();
+
+	 if(event->buttons() & Qt::LeftButton)
+	 {
+
+
+		 glBegin(GL_POLYGON);
+			 glVertex3f(lastPos.x(),lastPos.y(),0);
+			 glVertex3f(lastPos.x(),event->y(),0);
+			 glVertex3f(event->x(),event->y(),0);
+			 glVertex3f(event->x(),lastPos.y(),0);
+		 glEnd();
+
+		 glColor4f(1,1,0,0.7);
+	 glEnable(GL_BLEND);
+	 glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	 glBegin(GL_QUADS);
+			 glNormal3f(0,0,-1);
+			 glVertex2f(0,0);
+			 glVertex2f(0,1000);
+			 glVertex2f(1000,1000);
+			 glVertex2f(1000,0);
+		 glEnd();
+	glDisable(GL_BLEND);
+	glColor3f(1,1,1);
+	 }
+     
  }
 
  void GLWidget::xleft()
