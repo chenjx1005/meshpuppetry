@@ -28,6 +28,7 @@
      eye[2] = 8;
      center[0] = center[1] = center[2] =0;
      deep = 0;
+	 rubberIsShown=false;//不显示选框
  }
 
  GLWidget::~GLWidget()
@@ -87,7 +88,33 @@
      }
      else
          a->draw_vertex();
-	 
+	 if(rubberIsShown)//如果显示选框
+	 {
+	     /*glMatrixMode(GL_PROJECTION);
+		 glPushMatrix();
+		 glLoadIdentity();
+		 glOrtho(0,width(),height(),0,0,100);//?
+		 glMatrixMode(GL_MODELVIEW);
+		 glPushMatrix();
+		 glLoadIdentity();*/
+		 glColor4f(1,1,0,0.7);
+		 glEnable(GL_BLEND);
+		 glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+		 glBegin(GL_QUADS);
+				 //glNormal3f(0,0,-1);
+				 glVertex2f(rubbercorner1.x(),rubbercorner1.y());
+				 glVertex2f(rubbercorner1.x(),rubbercorner2.y());
+				 glVertex2f(rubbercorner2.x(),rubbercorner2.y());
+				 glVertex2f(rubbercorner2.x(),rubbercorner1.y());
+		 glEnd();
+		 glDisable(GL_BLEND);
+		 glColor3f(1,1,1);
+		 /*glPopMatrix();
+		 glMatrixMode(GL_PROJECTION);
+		 glPopMatrix();
+		 glMatrixMode(GL_MODELVIEW);
+		 updateGL();*/
+	 }
  }
 
  void GLWidget::resizeGL(int w, int h)
@@ -188,16 +215,17 @@ void GLWidget::stopPicking()
  void GLWidget::mousePressEvent(QMouseEvent *event)//单击鼠标后执行的事件
  {
      lastPos = event->pos();
-     if(event->buttons() & Qt::LeftButton)//单击左键执行选点操作
+	 rubbercorner1=rubbercorner2=event->pos();
+     /*if(event->buttons() & Qt::LeftButton)//单击左键执行选点操作
      {
-         startPicking(lastPos.x(),lastPos.y());
+		 startPicking(lastPos.x(),lastPos.y());
          a->draw_vertex();
          stopPicking();
          GLint    viewport[4];
          glGetIntegerv(GL_VIEWPORT, viewport);
          glReadPixels(event->x(),viewport[3]-event->y(), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &deep);//记录移动点的深度信息
          updateGL();
-     }
+     }*/
  }
 
  void GLWidget::mouseMoveEvent(QMouseEvent *event)//拖动鼠标执行的事件
@@ -239,29 +267,30 @@ void GLWidget::stopPicking()
 
 	 if(event->buttons() & Qt::LeftButton)
 	 {
-
-
-		 glBegin(GL_POLYGON);
-			 glVertex3f(lastPos.x(),lastPos.y(),0);
-			 glVertex3f(lastPos.x(),event->y(),0);
-			 glVertex3f(event->x(),event->y(),0);
-			 glVertex3f(event->x(),lastPos.y(),0);
-		 glEnd();
-
-		 glColor4f(1,1,0,0.7);
-	 glEnable(GL_BLEND);
-	 glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-	 glBegin(GL_QUADS);
-			 glNormal3f(0,0,-1);
-			 glVertex2f(0,0);
-			 glVertex2f(0,1000);
-			 glVertex2f(1000,1000);
-			 glVertex2f(1000,0);
-		 glEnd();
-	glDisable(GL_BLEND);
-	glColor3f(1,1,1);
+		 rubberIsShown=true;
+		 rubbercorner2=event->pos();
 	 }
      
+ }
+
+ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
+ {
+	 if(event->button()==Qt::LeftButton)//单击左键执行选点操作
+     {
+		 int x=(rubbercorner1.x()+rubbercorner2.x())/2;
+		 int y=(rubbercorner1.y()+rubbercorner2.y())/2;
+		 startPicking(x,y);
+         a->draw_vertex();
+         stopPicking();
+         GLint    viewport[4];
+         glGetIntegerv(GL_VIEWPORT, viewport);
+         glReadPixels(x,viewport[3]-y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &deep);//记录移动点的深度信息
+         updateGL();
+     }
+	 if(rubberIsShown)
+	 {
+		 rubberIsShown=false;
+	 }
  }
 
  void GLWidget::xleft()

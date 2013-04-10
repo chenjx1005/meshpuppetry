@@ -37,6 +37,7 @@ class armadillo;
      void resizeGL(int w, int h);
      void mousePressEvent(QMouseEvent *event);
      void mouseMoveEvent(QMouseEvent *event);
+	 void mouseReleaseEvent(QMouseEvent *event);
      void startPicking(int x,int y);
      void stopPicking();
      void processHits(int hits,GLuint* selectBuf);
@@ -52,7 +53,9 @@ class armadillo;
      float eye[3],center[3];
      GLuint selectBuf[1024];
      GLfloat deep;
-	 
+	 QPoint rubbercorner1;
+	 QPoint rubbercorner2;
+	 bool rubberIsShown;
  };
 
  #endif
