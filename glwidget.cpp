@@ -6,6 +6,7 @@
 
  #include "glwidget.h"
 #include "armadillo.h"
+#include "qtextbrowser.h"
 
  #ifndef GL_MULTISAMPLE
  #define GL_MULTISAMPLE  0x809D
@@ -29,6 +30,8 @@
      center[0] = center[1] = center[2] =0;
      deep = 0;
 	 rubberIsShown=false;//²»ÏÔÊ¾Ñ¡¿ò
+	 text=new QTextBrowser();
+	 text->insertPlainText("sdsd");
  }
 
  GLWidget::~GLWidget()
@@ -47,7 +50,7 @@
 
  void GLWidget::initializeGL()
  {
-     qglClearColor(Qt::black);
+	 qglClearColor(Qt::black);
 
      a = new armadillo;
      glEnable(GL_DEPTH_TEST);

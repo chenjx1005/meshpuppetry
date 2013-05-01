@@ -8,8 +8,9 @@ Window::Window(QWidget *parent) :
     ui(new Ui::Window)
 {
     ui->setupUi(this);
-    glWidget = new GLWidget;
-    ui->verticalLayout->addWidget(glWidget);
+	glWidget = new GLWidget();
+	ui->verticalLayout->addWidget(glWidget);
+	ui->horizontalLayout_2->addWidget(glWidget->text);
 	connect(ui->horizontalSlider,SIGNAL(valueChanged(int)),glWidget,SLOT(setalpha(int)));
 	connect(ui->radioButton,SIGNAL(clicked()),glWidget,SLOT(selectfix()));
 	connect(ui->radioButton_2,SIGNAL(clicked()),glWidget,SLOT(selectnew()));

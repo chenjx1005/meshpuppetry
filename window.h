@@ -14,12 +14,12 @@ class Window : public QWidget
     Q_OBJECT
     
 public:
-    explicit Window(QWidget *parent = 0);
+    explicit Window(QWidget *parent =0);
     ~Window();
     void keyPressEvent(QKeyEvent *event);
     
 private:
-    Ui::Window *ui;
+	Ui::Window *ui;
     GLWidget *glWidget;
 };
 

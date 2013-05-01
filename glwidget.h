@@ -1,9 +1,11 @@
 #ifndef GLWIDGET_H
- #define GLWIDGET_H
+#define GLWIDGET_H
 
- #include <QGLWidget>
+#include <QGLWidget>
+
 
 class armadillo;
+class QTextBrowser;
 
  class GLWidget : public QGLWidget
  {
@@ -41,7 +43,9 @@ class armadillo;
      void startPicking(int x,int y);
      void stopPicking();
      void processHits(int hits,GLuint* selectBuf);
-
+ 
+ public:
+	 QTextBrowser *text;
  private:
 	 armadillo *a;
      int xRot;
