@@ -2,9 +2,9 @@
 #include <QtOpenGL>
 #include <gl/GLU.h>
 
- #include <math.h>
+#include <math.h>
 
- #include "glwidget.h"
+#include "glwidget.h"
 #include "armadillo.h"
 #include "qtextbrowser.h"
 
@@ -26,12 +26,12 @@
      wwidth = wheight =0;
      eye[0] = 0;
      eye[1] = 0;
-     eye[2] = 8;
+     eye[2] = 6;
      center[0] = center[1] = center[2] =0;
      deep = 0;
 	 rubberIsShown=false;//不显示选框
 	 text=new QTextBrowser();
-	 text->insertPlainText("sdsd");
+	 text->insertPlainText("Actions:\n");
  }
 
  GLWidget::~GLWidget()
@@ -197,7 +197,7 @@ void GLWidget::processHits(int hits, GLuint buffer[])
     qDebug("\n");
 }
 
-void GLWidget::stopPicking()
+void GLWidget::stopPicking(int x, int y)
 {
     int hits;
 
@@ -209,26 +209,26 @@ void GLWidget::stopPicking()
 
     // returning to normal rendering model
     hits = glRenderMode(GL_RENDER);
-
+	glReadPixels(x, y, 5, 5, GL_DEPTH_COMPONENT, GL_FLOAT, &deep);//记录移动点的深度信息
     // if there are hits process them
-    if (hits != 0)
+    if (hits != 0 && deep!=1)
         processHits(hits, selectBuf);
 }
 
  void GLWidget::mousePressEvent(QMouseEvent *event)//单击鼠标后执行的事件
  {
      lastPos = event->pos();
-	 rubbercorner1=rubbercorner2=event->pos();
-     /*if(event->buttons() & Qt::LeftButton)//单击左键执行选点操作
+     if(event->buttons() & Qt::LeftButton)//单击左键执行选点操作
      {
+		 GLint    viewport[4];
+         glGetIntegerv(GL_VIEWPORT, viewport);
+		 int x=event->x();
+		 int y=viewport[3]-event->y();
 		 startPicking(lastPos.x(),lastPos.y());
          a->draw_vertex();
-         stopPicking();
-         GLint    viewport[4];
-         glGetIntegerv(GL_VIEWPORT, viewport);
-         glReadPixels(event->x(),viewport[3]-event->y(), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &deep);//记录移动点的深度信息
+         stopPicking(x,y);
          updateGL();
-     }*/
+     }
  }
 
  void GLWidget::mouseMoveEvent(QMouseEvent *event)//拖动鼠标执行的事件
@@ -266,6 +266,8 @@ void GLWidget::stopPicking()
          a->movevertex(posX,posY,posZ);
          updateGL();
 		 lastPos = event->pos();
+
+		 a->transform();
      }
 
 	 if(event->buttons() & Qt::LeftButton)
@@ -274,26 +276,6 @@ void GLWidget::stopPicking()
 		 rubbercorner2=event->pos();
 	 }
      
- }
-
- void GLWidget::mouseReleaseEvent(QMouseEvent *event)
- {
-	 if(event->button()==Qt::LeftButton)//单击左键执行选点操作
-     {
-		 int x=(rubbercorner1.x()+rubbercorner2.x())/2;
-		 int y=(rubbercorner1.y()+rubbercorner2.y())/2;
-		 startPicking(x,y);
-         a->draw_vertex();
-         stopPicking();
-         GLint    viewport[4];
-         glGetIntegerv(GL_VIEWPORT, viewport);
-         glReadPixels(x,viewport[3]-y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &deep);//记录移动点的深度信息
-         updateGL();
-     }
-	 if(rubberIsShown)
-	 {
-		 rubberIsShown=false;
-	 }
  }
 
  void GLWidget::xleft()
@@ -336,6 +318,26 @@ void GLWidget::stopPicking()
      updateGL();
  }
 
+ void GLWidget::up()
+ {
+	 a->up();
+	 updateGL();
+ }
+ void GLWidget::down()
+ {
+	 a->down();
+	 updateGL();
+ }
+ void GLWidget::left()
+ {
+	 a->left();
+	 updateGL();
+ }
+ void GLWidget::right()
+ {
+	 a->right();
+	 updateGL();
+ }
  void GLWidget::methodchange()
  {
      method = !method;
@@ -372,8 +374,64 @@ void GLWidget::stopPicking()
 	 a->setalpha(value);
  }
 
+ void GLWidget::setradius(int r)
+ {
+	 a->setradius(r);
+	 updateGL();
+ }
+
+ void GLWidget::setmethod1()
+ {
+	 a->setmethod(1);
+ }
+ 
+ void GLWidget::setmethod2()
+ {
+	 a->setmethod(2);
+ }
+
+ void GLWidget::setmethod3()
+ {
+	 a->setmethod(3);
+ }
  void GLWidget::freshv()
  {
 	 a->refreshfix();
 	 updateGL();
+ }
+
+  void GLWidget::transform()
+ {
+	 a->transform();
+	 updateGL();
+ }
+
+ void GLWidget::backup()
+ {
+	 delete a;
+	 a = new armadillo();
+	 updateGL();
+ }
+
+ void GLWidget::ReLoad()
+ {
+	 delete a;
+	 a = new armadillo();
+	 xRot = 0;
+     yRot = 0;
+     zRot = 0;
+     bPersp = bWire = method = false;
+     wwidth = wheight =0;
+     eye[0] = 0;
+     eye[1] = 0;
+     eye[2] = 6;
+     center[0] = center[1] = center[2] =0;
+     deep = 0;
+	 rubberIsShown=false;//不显示选框
+	 updateGL();
+ }
+
+ void GLWidget::Export(QString Exportname)
+ {
+	 a->Export(Exportname);
  }

@@ -2,8 +2,12 @@
  #include <QDesktopWidget>
  #include "window.h"
 
+//extern void initial();
+QString filename = "";
+
  int main(int argc, char *argv[])
  {
+	 //initial();
      QApplication app(argc, argv);
      Window window;
      window.resize(window.sizeHint());

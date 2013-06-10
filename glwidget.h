@@ -24,13 +24,25 @@ class QTextBrowser;
      void ydown();
      void znear();
      void zfar();
+	 void left();
+	 void right();
+	 void up();
+	 void down();
      void methodchange();
      void perspchange();
      void wirechange();
 	 void selectfix();
 	 void selectnew();
 	 void setalpha(int value);
+	 void setradius(int r);
+	 void setmethod1();
+	 void setmethod2();
+	 void setmethod3();
 	 void freshv();
+	 void transform();
+	 void backup();
+	 void ReLoad();
+	 void Export(QString Exportname);
  signals:
 
  protected:
@@ -39,11 +51,10 @@ class QTextBrowser;
      void resizeGL(int w, int h);
      void mousePressEvent(QMouseEvent *event);
      void mouseMoveEvent(QMouseEvent *event);
-	 void mouseReleaseEvent(QMouseEvent *event);
      void startPicking(int x,int y);
-     void stopPicking();
+     void stopPicking(int x, int y);
      void processHits(int hits,GLuint* selectBuf);
- 
+	 
  public:
 	 QTextBrowser *text;
  private:
